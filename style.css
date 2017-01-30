@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css?family=Pinyon+Script');
+
+body {
+    background-color: #d3d3d3;
+    font-family: 'Helvetica Neue', Helvetica;
+    font-size: 12pt;
+    color: #3a3a3a;
+}
+
+h1 {
+    color: #3a3a3a;
+    font-family: 'Pinyon Script', cursive;
+    font-size: 34pt;
+}
+
+h2 {
+    color: #3a3a3a;
+    font-family: 'Pinyon Script', cursive;
+    font-size: 28pt;
+}
+
+h3 {
+    color: #3a3a3a;
+    font-family: Arial;
+    font-size: 12pt;
+}
+
+title {
+    color: #3a3a3a;
+    font-family: 'Pinyon Script', cursive;
+    font-size: 40pt;
+}
+
+#outer{
+    width: 100%;
+    float: left;
+}
+
+#timeline {
+    margin: 0;
+    padding: 0;
+    border-spacing: 4em;
+}
+
+#timeline li {
+    list-style-type: none;
+    background: #fafafa;
+    padding: 1em;
+    margin-bottom: 1em;
+    margin-top: 1em;
+    position: relative;
+}
+
+#menu{
+    text-align: center;
+    font-size: 16pt;
+    font-family: georgia;
+    word-spacing: 30px;
+}
+
+div.main {
+    padding: 5px;
+    padding-left: 20px;
+    padding-bottom: 10px;
+    margin: 0 auto;
+    display: block;
+    width: 645px;
+    border: none;
+    background: #d3d3d3;
+}
+
+iframe {
+    margin: 0 auto;
+	display: block;
+    width: 680px;
+    height: 485px;
+	border: none;
+    background: white;
+    overflow: hidden;
+}
+
+/* links */
+
+a:link {
+    color: #cc4452;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #31152b;
+}
+
+a:hover {
+    color: #723147;
+}
+
+a:active {
+    color: #cc4452;
+}
+
+/* pictures */
+
+img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+div.img {
+    margin: 5px;
+    border: 1px solid white;
+    float: left;
+    width: 180px;
+}
+
+div.img:hover {
+    border: 1px solid grey;
+}
+
+div.img img {
+    width: 100%;
+    height: auto;
+}
+
+p {
+    font-family: 'Helvetica Neue', Helvetica;
+    font-size: 12px;
+}
+
+#main {
+    min-height: 300px;
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+    width: 70%;
+    flex-direction: column;
+}
+
+/* Table Properties */
+table, td, th {
+   border: 1px solid white;
+   width: 500px;
+   border-collapse: collapse;
+   padd
+}
+
+th, td{
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+th {
+    background: #ffe9ec;
+    font-weight: bold; 
+}
+
+td {
+    background: #fafafa;
+}
