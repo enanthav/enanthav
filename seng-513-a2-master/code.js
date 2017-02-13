@@ -4,7 +4,7 @@
 
 function numWords(txt) {
     var trim = txt.trim();
-    nWords = trim.split(" ").length;
+    nWords = trim.split(/(\s+)/).length;
     return nWords;
 }
 
@@ -17,9 +17,6 @@ function numLines(txt) {
     return count;
 }
 
-function numNonEmptyLines(txt){
-    return txt.split(/\S\n|\S\r\n|\S\r/).length;
-}
 
 function longestLine(txt){
     var max = 0;
@@ -35,41 +32,46 @@ function longestLine(txt){
 
 function avgWordLength(txt) {
     var average = 0;
-    var array = txt.split(" ");
+    var array = txt.split(/(\s+)/);
     for(var i = 0; i < array.length; i++){
         average += array[i].length;
     }
     average = average/array.length;
     return average;
 }
-// Will contain the 10 most frequent words in the text, concatenated with their respective frequencies. 
-// Use alphabetic sorting to to resolve frequency ties. The results will include the corresponding frequencies appended to the actual words surrounded by brackets.
+
+
 function tenMostFrequentWords(txt) {
     txt = txt.toLowerCase();
     txt = txt.replace(/[".,'?+\/!@#$%\^&\*;:{}=\-_`~()]/gm, " "); // remove punctuation
     var oldTxt = txt.split(" "); // split at space
-    var wordCounts = {}, word, frequency, i; // create object
+    txt = txt.replace(/(\r|\n)/gm,""); // remove newline
+    var wordCounts = {}; // create object
 
-    oldTxt.forEach(function(key)) {
+    oldTxt.forEach(function(key) {
         if (!wordCounts[key]) {
-            wordCOunts[key] = 0;
-        } else {
-            wordCounts[key]++;
+            wordCounts[key] = 0;
         }
+        wordCounts[key] += 1;
     });
 
-    oldTxt.sort(function(a, b) {
-        return b.frequency - a.frequency;
-    });
+    /* PSEUDOCODE
 
-    return oldTxt;
+    // sort the wordCounts by frequency
+    var mostFrequent = [];
+    for (var i = 0; i < 9; i++){
+      mostFrequent[i] = wordCounts.word + "(" + wordCounts.frequency + ")";
+    }
+    // return mostFrequent;
+    */
+    return wordCounts;
 }
-
 
 // This function will return an array of palindromes (strings) in the order they appear
 function findPalindromes(txt){
     txt = txt.toLowerCase();
-    txt = txt.replace(/[".,'?+\/!@#$%\^&\*;:{}=\-_`~()]/gm," "); // remove punctuation
+    txt = txt.replace(/[.,'"?+\/!@#$%\^&\*;:{}=\-_`~()]/gm," "); // remove punctuation
+    txt = txt.replace(/(\r|\n)/g,""); // remove newline
     var oldTxt = txt.split(" ");
     var array = [];
     var count = 0;
@@ -89,7 +91,8 @@ function findPalindromes(txt){
 
 function tenLongestWords(txt){
     txt = txt.toLowerCase();
-    txt = txt.replace(/[".,'?+\/!@#$%\^&\*;:{}=\-_`~()]/gm, ""); // remove punctuation
+    txt = txt.replace(/[.',"+\/#!$%\^&\*;:{}=\-_`~()]/gm, " "); // remove punctuation
+    txt = txt.replace(/(\r|\n)/g,"");  // remove newline
     var oldTxt = txt.split(" "); // split at space
 
     // sort by length (ascending) and alphabetically
@@ -114,26 +117,16 @@ function tenLongestWords(txt){
 
 
 function getStats(txt) {
-
-    // var word = {nChars: 0, nWords }
-    var nChars = txt.length;
-    var nWords = numWords(txt);
-    var nLines = numLines(txt);
-    var maxLineLength = longestLine(txt);
-    var averageWordLength = avgWordLength(txt);
-    var nNonEmptyLines = txt.split(/\S\r\n|\S\r|\S\n/).length;
-    var longestWords = tenLongestWords(txt);
-    return longestWords;
-    /*return {
-        nChars: 123,
-        nWords: 22,
-        nLines: 10,
-        nNonEmptyLines: 22,
-        averageWordLength: 3.3,
-        maxLineLength: 33,
-        palindromes: ["12321", "kayak", "mom"],
-        longestWords: ["xxxxxxxxx", "123444444"],
-        mostFrequentWords: [ "hello(7)", "world(1)" ]
-    }*/;
+    var stats = {}, nChars, nWords, nLines, maxLinelength, averageWordLength, palindromes, nNonEmptyLines, longestWords, mostFrequentWords;
+    stats.nChars = txt.length;
+    stats.nWords = numWords(txt);
+    stats.nLines = numLines(txt);
+    stats.maxLineLength = longestLine(txt);
+    stats.averageWordLength = avgWordLength(txt);
+    stats.palindromes = findPalindromes(txt);
+    stats.nNonEmptyLines = txt.match(/^\s*\S/gm).length;
+    stats.longestWords = tenLongestWords(txt);
+    stats.mostFrequentWords = tenMostFrequentWords(txt);
+    return stats;
 }
 
