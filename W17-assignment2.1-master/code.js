@@ -29,19 +29,30 @@ function longestLine(txt){
     return max;
 }
 
+function avgWordLength(txt) {
+    var average = 0;
+    var array = txt.split(/(\s+)/);
+    for(var i = 0; i < array.length; i++){
+        average += array[i].length;
+    }
+    average = average/array.length;
+    return average;
+}
+
+
 function getStats(txt) {
     var stats = {}, nChars, nWords, nLines, maxLinelength, averageWordLength, palindromes, nNonEmptyLines, longestWords, mostFrequentWords;
     stats.nChars = txt.length;
     stats.nWords = numWords(txt);
     stats.nLines = numLines(txt).length;
     stats.nNonEmptyLines = txt.match(/^\s*\S/gm).length;
-    stats.longestWords = tenLongestWords(txt);
-    /*
     stats.maxLineLength = longestLine(txt);
     stats.averageWordLength = avgWordLength(txt);
+    
+    /*
     stats.palindromes = findPalindromes(txt);
 
-
+    stats.longestWords = tenLongestWords(txt);
     stats.mostFrequentWords = tenMostFrequentWords(txt);
     */
     return stats;
