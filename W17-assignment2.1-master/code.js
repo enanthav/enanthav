@@ -18,10 +18,20 @@ function numLines(txt) {
     return count;
 }
 
+function longestLine(txt){
+    var max = 0;
+    var array = txt.split(/\r\n|\r|\n/);
+    for(var i = 0; i < array.length; i++){
+        if (array[i].length > max) {
+            max = array[i].length;
+        }
+    }
+    return max;
+}
+
 function getStats(txt) {
     var stats = {}, nChars, nWords, nLines, maxLinelength, averageWordLength, palindromes, nNonEmptyLines, longestWords, mostFrequentWords;
     stats.nChars = txt.length;
-    // stats.nChars = txt.split("");
     stats.nWords = numWords(txt);
     stats.nLines = numLines(txt).length;
     stats.nNonEmptyLines = txt.match(/^\s*\S/gm).length;
