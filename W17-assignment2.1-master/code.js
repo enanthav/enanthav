@@ -35,12 +35,13 @@ function getStats(txt) {
     stats.nWords = numWords(txt);
     stats.nLines = numLines(txt).length;
     stats.nNonEmptyLines = txt.match(/^\s*\S/gm).length;
+    stats.longestWords = tenLongestWords(txt);
     /*
     stats.maxLineLength = longestLine(txt);
     stats.averageWordLength = avgWordLength(txt);
     stats.palindromes = findPalindromes(txt);
 
-    stats.longestWords = tenLongestWords(txt);
+
     stats.mostFrequentWords = tenMostFrequentWords(txt);
     */
     return stats;
