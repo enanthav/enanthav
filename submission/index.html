@@ -1,0 +1,215 @@
+<!doctype html>
+<html>
+  <head>
+    <title>SENG 513 Chat</title>
+    <meta http-equic="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: white; padding: 3px; }
+      form input { border: 0; background: #eee; padding: 5px; width: 100%; margin-right: .5%; }
+      #chatForm { border: 0; padding: 0px; width: 100%; }
+      #messages { list-style-type: none; margin: 0; padding: 5px 10px; overflow-y:scroll;}
+      #users {list-style-position: right; list-style-type: none; margin: 0; padding: 5;}
+
+      div ul{font-family: 'Raleway', sans-serif;
+        font-size: 14px; max-height: 100%; width:100%;}
+      div ul{overflow:hidden; overflow-y: auto; position: absolute; bottom:0; left:0; vertical-align: bottom;}
+
+      section {
+        max-width: 740px;
+        margin: 0 auto;
+        display: flex;
+        height: 500px;
+        flex-flow: row wrap;
+      }
+
+      #small {
+        max-width: 740px;
+        margin: 0 auto;
+        display: flex;
+        height: 30px;
+        flex-flow: row wrap;
+      }
+
+      body {
+        font-family: 'Raleway', sans-serif;
+        font-size: 8px;
+        padding: 10px;
+      }
+
+      #d1, #users {
+        background: lightblue;
+        position: relative;
+      }
+
+      #d3, #d4 {
+        background: white;
+      }
+
+      .divin {
+        padding: 10px;
+        border: none;
+        font-size: 2em;
+        margin: 3px;
+      }
+
+      #d1 {
+        flex: 1 1 0;
+        min-width: 400px;
+        padding: 5px 10px;
+      }
+
+      #users, #d4 {
+        flex: 1 1 0;
+        max-width: 200px;
+        min-width: 200px;
+      }
+
+      #d3 {
+        flex: 1 1 0;
+        min-width: 400px;
+        max-height: 20px;
+      }
+
+      #d0 {
+        flex: 1 1 0;
+        max-height: 20px;
+      }
+      .nickname {
+        clear: both;
+      }
+      .message {
+        float: left;
+        clear: both;
+      }
+    </style>
+
+
+  </head>
+  <body>
+<section id="small">
+  <div id="d0" class="divin">
+      <p id="welcome">Welcome <span id="user">user1</span></p>
+  </div>
+  <div id="d4" class="divin">
+    <p id="welcome">Online Users:</p>
+</div>
+</section>
+
+<section>
+  <div id="d1" class="divin"><ul id="messages"></ul></div>  
+  <div id="users" class="divin"></div>
+</section>
+
+<section id="small">
+  <div id="d3" class="divin">
+    <form id= "chatForm" action="">
+      <input id="m" autocomplete="off" />
+    </form>
+  </div>
+
+  </div>
+</section>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+
+    <script>
+      var username;
+      var socket = io();
+      checkCookie();
+      
+      $('#chatForm').submit(function(){
+        socket.emit('chat message', $('#m').val());
+        $('#m').val('');
+        return false;
+      });
+
+      function addMessage(time, nick, color, msg){
+        if (nick === username){ // bold messages from sender
+          var html = '<span class="message"><strong>' + time + ' ' + nick + ': ' + msg + '</strong>';
+        } else { // format regular message
+          var html = '<span class="message">' + time +  ' ' + '<span class="nickname" style="color: #' + color + '">' + nick + ':</span> ' + msg;
+        }
+        $('#messages').append(html);
+      }
+
+      function checkCookie(){
+        if (document.cookie.indexOf('userID=') == -1){
+          alert("cookie doesn't exist");
+        } else {
+          alert("cookie does exist");
+        }
+      }
+      function setCookie(cname, cvalue){
+        document.cookie = cname + "=" + cvalue + ";";
+      }
+
+      function getCookie(cname){
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = document.cookie.split(';');
+        for(var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+      }
+
+      // Populate and display chat history
+      socket.on('display log', function(msg){
+        for (i = 0; i < msg.length; i++){
+          var html = '<span class="message">' + msg[i];
+          $('#messages').append(html);
+        }
+        $('#messages').scrollTop($('#messages').prop('scrollHeight') - $('#messages').height());
+      });
+
+      // Populate and display user list
+      socket.on('users', function(msg){
+        var listUsers = '';
+        for (i = 0; i < msg.length; i++){
+          listUsers += msg[i] + '<br>';
+        }
+        $('#users').html(listUsers);
+      });
+
+      // Add message to chat area
+      socket.on('chat message', function(timestamp, username, color, message){
+        addMessage(timestamp, username, color, message);
+        // Ensure messages autoscroll
+        $('#messages').scrollTop($('#messages').prop('scrollHeight') - $('#messages').height());
+      });
+
+      // Format and display error message
+      socket.on('error message', function(msg){
+        var html = '<span class="message" style="color: red">' + msg + '</span>';
+        $('#messages').append(html);
+      });
+
+      // Format and display information message
+      socket.on('system message', function(msg){
+        var html = '<span class="message" style="font-style: italic">' + msg + '</span>';
+        $('#messages').append(html);
+      });
+
+      // Store client ID in cookie
+      socket.on('store cookie', function(name, id){
+        setCookie(name, id);
+      });
+
+      // Update welcome message
+      socket.on('update username', function(msg){
+        username = msg;
+        $('#user').text(msg);
+      });
+    </script>
+  </body>
+</html>
