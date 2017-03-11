@@ -1,96 +1,215 @@
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="styles.css">
-<title>SENG513W17 Assignment 2</title>
-<div id="wrapper">
-    <div id="form">
-        <div class="header">Enter or Paste Your Text</div>
-        <textarea id="txtarea">Sample text.</textarea>
-        <div class="buttons">
-            <button id="button-submit" title="Compute stats">Compute Stats</button>
-            <div class="hspacer"></div>
-            <button id="button-clear" title="Clear text">Clear</button>
-            <button id="button-ex1" title="Lorem ipsum">Ex1</button>
-            <button id="button-ex2" title="Basic example">Ex2</button>
-            <button id="button-ex3" title="Nasty example">Ex3</button>
-        </div>
-        <div class="header">Results</div>
-        <pre id="results">Your results will appear here.</pre>
-    </div>
+<!doctype html>
+<html>
+  <head>
+    <title>SENG 513 Chat</title>
+    <meta http-equic="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: white; padding: 3px; }
+      form input { border: 0; background: #eee; padding: 5px; width: 100%; margin-right: .5%; }
+      #chatForm { border: 0; padding: 0px; width: 100%; }
+      #messages { list-style-type: none; margin: 0; padding: 5px 10px; overflow-y:scroll;}
+      #users {list-style-position: right; list-style-type: none; margin: 0; padding: 5;}
+
+      div ul{font-family: 'Raleway', sans-serif;
+        font-size: 14px; max-height: 100%; width:100%;}
+      div ul{overflow:hidden; overflow-y: auto; position: absolute; bottom:0; left:0; vertical-align: bottom;}
+
+      section {
+        max-width: 740px;
+        margin: 0 auto;
+        display: flex;
+        height: 500px;
+        flex-flow: row wrap;
+      }
+
+      #small {
+        max-width: 740px;
+        margin: 0 auto;
+        display: flex;
+        height: 30px;
+        flex-flow: row wrap;
+      }
+
+      body {
+        font-family: 'Raleway', sans-serif;
+        font-size: 8px;
+        padding: 10px;
+      }
+
+      #d1, #users {
+        background: lightblue;
+        position: relative;
+      }
+
+      #d3, #d4 {
+        background: white;
+      }
+
+      .divin {
+        padding: 10px;
+        border: none;
+        font-size: 2em;
+        margin: 3px;
+      }
+
+      #d1 {
+        flex: 1 1 0;
+        min-width: 400px;
+        padding: 5px 10px;
+      }
+
+      #users, #d4 {
+        flex: 1 1 0;
+        max-width: 200px;
+        min-width: 200px;
+      }
+
+      #d3 {
+        flex: 1 1 0;
+        min-width: 400px;
+        max-height: 20px;
+      }
+
+      #d0 {
+        flex: 1 1 0;
+        max-height: 20px;
+      }
+      .nickname {
+        clear: both;
+      }
+      .message {
+        float: left;
+        clear: both;
+      }
+    </style>
+
+
+  </head>
+  <body>
+<section id="small">
+  <div id="d0" class="divin">
+      <p id="welcome">Welcome <span id="user">user1</span></p>
+  </div>
+  <div id="d4" class="divin">
+    <p id="welcome">Online Users:</p>
 </div>
+</section>
 
-<script>
-    (function () {
-        let entityMap = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;',
-            '/': '&#x2F;',
-            '`': '&#x60;',
-            '=': '&#x3D;'
-        };
+<section>
+  <div id="d1" class="divin"><ul id="messages"></ul></div>  
+  <div id="users" class="divin"></div>
+</section>
 
-        function escapeHtml(string) {
-            return String(string).replace(/[&<>"'`=\/]/g, function (s) {
-                return entityMap[s];
-            });
+<section id="small">
+  <div id="d3" class="divin">
+    <form id= "chatForm" action="">
+      <input id="m" autocomplete="off" />
+    </form>
+  </div>
+
+  </div>
+</section>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+
+    <script>
+      var username;
+      var socket = io();
+      checkCookie();
+      
+      $('#chatForm').submit(function(){
+        socket.emit('chat message', $('#m').val());
+        $('#m').val('');
+        return false;
+      });
+
+      function addMessage(time, nick, color, msg){
+        if (nick === username){ // bold messages from sender
+          var html = '<span class="message"><strong>' + time + ' ' + nick + ': ' + msg + '</strong>';
+        } else { // format regular message
+          var html = '<span class="message">' + time +  ' ' + '<span class="nickname" style="color: #' + color + '">' + nick + ':</span> ' + msg;
         }
+        $('#messages').append(html);
+      }
 
-        function onload() {
-            let resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = "Click";
-            let txtArea = document.getElementById('txtarea');
+      function checkCookie(){
+        if (document.cookie.indexOf('userID=') == -1){
+          alert("cookie doesn't exist");
+        } else {
+          alert("cookie does exist");
+        }
+      }
+      function setCookie(cname, cvalue){
+        document.cookie = cname + "=" + cvalue + ";";
+      }
 
-            document.getElementById("button-submit").onclick = function () {
-                res = getStats(txtArea.value);
-                res = JSON.stringify(res, null, 4);
-                res = escapeHtml(res);
-                resultsDiv.innerHTML = res;
+      function getCookie(cname){
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = document.cookie.split(';');
+        for(var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
             }
-
-            document.getElementById("button-clear").onclick = function () {
-                txtArea.value = "";
-                txtArea.focus();
-                return false;
-            }
-
-            document.getElementById("button-ex1").onclick = function () {
-                txtArea.value = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n" +
-                    "Vivamus pharetra dolor mi. Etiam laoreet bibendum quam ut cursus.\n" +
-                    "Pellentesque in efficitur purus, nec molestie sapien. Duis interdum\n" +
-                    "orci quis turpis auctor molestie. Cum sociis natoque penatibus et magnis\n" +
-                    "dis parturient montes, nascetur ridiculus mus. Nullam tristique vulputate\n" +
-                    "cursus. Sed vulputate ex ac ex congue, sit amet iaculis massa pretium.\n";
-            }
-
-            document.getElementById("button-ex3").onclick = function () {
-                txtArea.value = "" +
-                    "   This is a tough example, you have been warned.    \n" +
-                    "           \t       \n" +
-                    "The line above is empty!\n" +
-                    "            Here are some palindromes: Anna, kayak and racecar. " +
-                    "Here are 3 more palindromes: Madam+civiC+noon:-)\n\n" +
-                    "    Numeric palindromes are also possible: 1234321 is one of them...\n" +
-                    "        Make  sure you handle  spaces  properly         .   !!!\n" +
-                    "\n" +
-                    "        Do you like long words? Antidisestablishmentarianism is a pretty famous one.\n" +
-                    "        So is this one: \"xxxxxxxxxxxxxxxxxxxxxxxxxxxx\" and it is also a palindrome." +
-                    " It is as long as Antidisestablishmentarianism.\n" +
-                    "\n        Yup, that's a word using our definition.\n" +
-                    "\n" +
-                    "    I am inserting some palindromes\n" +
-                    "\n" +
-                    "wow, this is a nasty example, isn't it?\n" +
-                    "Let's add one last line, this one does not have \\n";
-            }
-
-            document.getElementById("button-ex2").onclick = function () {
-                txtArea.value = "word1 word22 word333 word4444 word55555 word4444 word333 word22 word1";
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
             }
         }
-        
-        window.onload = onload();
-    })();
-</script>
-<script src="code.js"></script>
+        return "";
+      }
+
+      // Populate and display chat history
+      socket.on('display log', function(msg){
+        for (i = 0; i < msg.length; i++){
+          var html = '<span class="message">' + msg[i];
+          $('#messages').append(html);
+        }
+        $('#messages').scrollTop($('#messages').prop('scrollHeight') - $('#messages').height());
+      });
+
+      // Populate and display user list
+      socket.on('users', function(msg){
+        var listUsers = '';
+        for (i = 0; i < msg.length; i++){
+          listUsers += msg[i] + '<br>';
+        }
+        $('#users').html(listUsers);
+      });
+
+      // Add message to chat area
+      socket.on('chat message', function(timestamp, username, color, message){
+        addMessage(timestamp, username, color, message);
+        // Ensure messages autoscroll
+        $('#messages').scrollTop($('#messages').prop('scrollHeight') - $('#messages').height());
+      });
+
+      // Format and display error message
+      socket.on('error message', function(msg){
+        var html = '<span class="message" style="color: red">' + msg + '</span>';
+        $('#messages').append(html);
+      });
+
+      // Format and display information message
+      socket.on('system message', function(msg){
+        var html = '<span class="message" style="font-style: italic">' + msg + '</span>';
+        $('#messages').append(html);
+      });
+
+      // Store client ID in cookie
+      socket.on('store cookie', function(name, id){
+        setCookie(name, id);
+      });
+
+      // Update welcome message
+      socket.on('update username', function(msg){
+        username = msg;
+        $('#user').text(msg);
+      });
+    </script>
+  </body>
+</html>
