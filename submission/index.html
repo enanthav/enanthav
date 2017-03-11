@@ -119,8 +119,19 @@
     <script>
       var username;
       var socket = io();
-      checkCookie();
-      
+
+      // var cookieUsername = getCookie(userID);
+      /***** cookies functionality incomplete ******/
+      if (document.cookie.match(/^(.*;)?userID=[^;]+(.*)?$/)) { // cookies exist
+        // get cookie
+        // send id to server
+        // update username from server
+        socket.emit('generate ID', false);
+      } else { // the cookie doesn't exist!!
+        // get unique ID from server
+        // set cookie with unique ID from server
+      }
+
       $('#chatForm').submit(function(){
         socket.emit('chat message', $('#m').val());
         $('#m').val('');
@@ -136,15 +147,10 @@
         $('#messages').append(html);
       }
 
-      function checkCookie(){
-        if (document.cookie.indexOf('userID=') == -1){
-          alert("cookie doesn't exist");
-        } else {
-          alert("cookie does exist");
-        }
-      }
       function setCookie(cname, cvalue){
-        document.cookie = cname + "=" + cvalue + ";";
+        var date = new Date();
+        date.setTime(date.getTime() + (30 * 60 * 1000));
+        document.cookie = cname + "=" + cvalue + ";" + date + ";path=/";
       }
 
       function getCookie(cname){
